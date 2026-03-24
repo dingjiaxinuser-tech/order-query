@@ -2,516 +2,145 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐰订单查询系统 - 实时状态</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📦 订单查询</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
     <style>
-        :root {
-            --primary-color: #8e2de2;
-            --secondary-color: #4a00e0;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #17a2b8;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
             color: #333;
+            line-height: 1.4;
+            padding: 10px;
+            font-size: 14px;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+        /* 头部 */
         .header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px 20px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-            animation: float 20s linear infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-30px, -30px) rotate(360deg); }
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
         
         .logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            font-size: 50px;
+            margin-bottom: 10px;
         }
         
         .title {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #667eea;
         }
         
         .subtitle {
-            font-size: 18px;
-            opacity: 0.9;
-            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
         }
         
-        .url-display {
-            background: rgba(255,255,255,0.2);
-            padding: 12px 20px;
-            border-radius: 10px;
-            display: inline-block;
-            font-family: monospace;
-            font-size: 16px;
-            margin-top: 10px;
+        /* 卡片 */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
         
-        .content {
-            padding: 40px;
-        }
-        
-        .search-section {
-            background: var(--light-color);
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .search-title {
-            font-size: 24px;
-            color: var(--dark-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .search-input {
-            flex: 1;
-            padding: 16px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.1);
-        }
-        
-        .search-btn {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            padding: 0 30px;
-            border-radius: 10px;
-            font-size: 16px;
+        /* 登录区域 */
+        .login-title {
+            font-size: 18px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3);
-        }
-        
-        .search-btn:active {
-            transform: translateY(0);
-        }
-        
-        .search-tips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .search-tip {
-            background: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #666;
-            border: 1px solid #e0e0e0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .search-tip:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .result-section {
-            display: none;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .customer-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--primary-color);
-        }
-        
-        .customer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--light-color);
-        }
-        
-        .customer-info h3 {
-            font-size: 24px;
-            color: var(--dark-color);
-            margin-bottom: 5px;
-        }
-        
-        .customer-id {
-            color: #666;
-            font-size: 14px;
-            background: var(--light-color);
-            padding: 5px 12px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        
-        .customer-stats {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .stat-item {
             text-align: center;
+            margin-bottom: 20px;
+            color: #333;
         }
         
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .orders-list {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .order-card {
-            background: var(--light-color);
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .order-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .order-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: var(--primary-color);
-        }
-        
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .input-group {
             margin-bottom: 15px;
         }
         
-        .order-product {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        .order-status {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .status-ordered { background: #cce5ff; color: #004085; }
-        .status-shipped { background: #d1ecf1; color: #0c5460; }
-        .status-transit { background: #fff3cd; color: #856404; }
-        .status-completed { background: #d4edda; color: #155724; }
-        .status-failed { background: #f8d7da; color: #721c24; }
-        
-        .order-details {
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
             color: #666;
-            line-height: 1.6;
-        }
-        
-        .detail-row {
-            display: flex;
-            margin-bottom: 8px;
-        }
-        
-        .detail-label {
-            min-width: 80px;
-            color: #999;
-            font-size: 14px;
-        }
-        
-        .detail-value {
-            flex: 1;
             font-weight: 500;
         }
         
-        .tracking-info {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 3px solid var(--primary-color);
-        }
-        
-        .tracking-label {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        
-        .tracking-number {
-            font-family: 'Courier New', monospace;
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
-            color: var(--dark-color);
-            background: var(--light-color);
-            padding: 8px 12px;
-            border-radius: 6px;
-            display: inline-block;
+            background: #fafafa;
+            transition: all 0.2s ease;
         }
         
-        .order-time {
-            color: #999;
-            font-size: 13px;
-            margin-top: 15px;
-            text-align: right;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 60px 40px;
-        }
-        
-        .no-results-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-        
-        .no-results h3 {
-            font-size: 24px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .no-results p {
-            color: #999;
-            margin-bottom: 20px;
-        }
-        
-        .all-customers-btn {
+        input:focus {
+            outline: none;
+            border-color: #667eea;
             background: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            padding: 12px 30px;
-            border-radius: 10px;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-block;
+            transition: all 0.2s ease;
+            margin-top: 5px;
         }
         
-        .all-customers-btn:hover {
-            background: var(--primary-color);
-            color: white;
+        .btn:active {
+            transform: scale(0.98);
         }
         
-        .stats-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            border-radius: 15px;
-            margin-top: 40px;
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+            margin-top: 10px;
         }
         
-        .stats-title {
-            font-size: 28px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        
-        .stat-card {
-            background: rgba(255,255,255,0.1);
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .stat-card .value {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-        
-        .stat-card .label {
-            font-size: 14px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .update-info {
-            text-align: center;
-            color: #999;
-            font-size: 14px;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        
-        .update-time {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        footer {
-            background: var(--dark-color);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-        
-        .footer-content {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .contact-info {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        
-        .tech-support {
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .site-info {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 20px;
-        }
-        
+        /* 加载 */
         .loading {
-            display: none;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
+            display: none;
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
             width: 40px;
             height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
@@ -521,74 +150,166 @@
             100% { transform: rotate(360deg); }
         }
         
-        .error-message {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
+        /* 错误 */
+        .error {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 12px;
             text-align: center;
+            margin-top: 15px;
             display: none;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                border-radius: 15px;
+        /* 订单区域 */
+        .order-section {
+            display: none;
+        }
+        
+        .welcome {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .welcome h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .welcome p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 订单卡片 */
+        .order-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-shipped { background: #d4edda; color: #155724; }
+        .status-ordered { background: #cce5ff; color: #004085; }
+        .status-transit { background: #fff3cd; color: #856404; }
+        .status-completed { background: #e2e3e5; color: #383d41; }
+        
+        .order-info {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 6px;
+        }
+        
+        .label {
+            min-width: 60px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .value {
+            flex: 1;
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .tracking {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .tracking-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .tracking-number {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .order-time {
+            font-size: 11px;
+            color: #999;
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        /* 无订单 */
+        .no-orders {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .no-orders-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            font-size: 12px;
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 375px) {
+            body {
+                padding: 8px;
             }
             
             .header {
-                padding: 30px 20px;
-            }
-            
-            .title {
-                font-size: 28px;
+                padding: 20px 15px;
             }
             
             .logo {
-                font-size: 60px;
+                font-size: 40px;
             }
             
-            .content {
-                padding: 20px;
+            .title {
+                font-size: 18px;
             }
             
-            .search-box {
-                flex-direction: column;
+            .card {
+                padding: 18px 15px;
             }
-            
-            .search-btn {
-                width: 100%;
-                justify-content: center;
-                padding: 16px;
-            }
-            
-            .customer-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .customer-stats {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .back-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 20px;
-            display: inline-block;
         }
     </style>
 </head>
@@ -596,437 +317,185 @@
     <div class="container">
         <!-- 头部 -->
         <div class="header">
-            <div class="logo">📦</div>
-            <h1 class="title">🐰订单查询系统</h1>
-            <p class="subtitle">固定网址 · 实时更新 · 客户专用</p>
-            <div class="url-display" id="siteUrl">https://dingjiaxinuser-tech.github.io/order-query</div>
+            <div class="logo">🐰</div>
+            <h1 class="title">嘉欣订单查询</h1>
+            <p class="subtitle">安全 · 便捷 · 实时更新</p>
         </div>
         
-        <!-- 内容区域 -->
-        <div class="content">
-            <!-- 搜索区域 -->
-            <div class="search-section">
-                <h2 class="search-title">
-                    <span>🔍</span> 查询订单状态
-                </h2>
-                <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" 
-                           placeholder="请输入客户微信号（例如：z6y2f1）" autocomplete="off">
-                    <button class="search-btn" id="searchBtn">
-                        <span>📋</span> 查询订单
-                    </button>
-                </div>
-                <div class="search-tips">
-                    <div class="search-tip" data-wechat="z6y2f1">逸飞 (z6y2f1)</div>
-                    <div class="search-tip" data-wechat="pyf20010914">潘妍霏 (pyf20010914)</div>
-                    <div class="search-tip" data-wechat="ljyy0208050">连理 (ljyy0208050)</div>
-                    <div class="search-tip" data-wechat="wxsnowywx77">Sssnowy (wxsnowywx77)</div>
-                </div>
+        <!-- 登录区域 -->
+        <div class="card" id="loginCard">
+            <h2 class="login-title">🔐 身份验证</h2>
+            <div class="input-group">
+                <label for="authCode">请输入您的验证信息</label>
+                <input type="text" id="authCode" placeholder="请输入验证信息" autocomplete="off" autofocus>
+            </div>
+            <button class="btn" id="loginBtn">查询订单</button>
+            <div class="error" id="errorMsg"></div>
+        </div>
+        
+        <!-- 加载 -->
+        <div class="card loading" id="loadingCard">
+            <div class="spinner"></div>
+            <p>正在查询，请稍候...</p>
+        </div>
+        
+        <!-- 订单区域 -->
+        <div class="order-section" id="orderSection">
+            <div class="card welcome">
+                <h2>您好，欢迎回来</h2>
+                <p>以下是您的订单信息</p>
             </div>
             
-            <!-- 加载中 -->
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>正在查询订单信息，请稍候...</p>
-            </div>
+            <div id="ordersContainer"></div>
             
-            <!-- 错误信息 -->
-            <div class="error-message" id="errorMessage">
-                <h3>❌ 查询失败</h3>
-                <p id="errorText">请输入正确的微信号</p>
-            </div>
-            
-            <!-- 查询结果 -->
-            <div class="result-section" id="resultSection">
-                <!-- 结果会动态生成在这里 -->
-            </div>
-            
-            <!-- 统计数据 -->
-            <div class="stats-section" id="statsSection">
-                <h2 class="stats-title">📊 今日业务统计</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="value">¥1,905</div>
-                        <div class="label">今日收入</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">¥769.06</div>
-                        <div class="label">今日支出</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">¥1,147</div>
-                        <div class="label">今日利润</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">8</div>
-                        <div class="label">进行中订单</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 更新信息 -->
-            <div class="update-info">
-                <p>📅 数据最后更新：<span class="update-time" id="updateTime">2026年3月24日 21:30</span></p>
-                <p>🔄 系统每30分钟自动同步最新数据</p>
-            </div>
+            <button class="btn btn-secondary" id="backBtn">← 返回验证页面</button>
         </div>
         
         <!-- 页脚 -->
-        <footer>
-            <div class="footer-content">
-                <div class="contact-info">
-                    📞 客服微信：🐰 | 📧 业务咨询：嘉欣
-                </div>
-                <div class="tech-support">
-                    ✨ 技术支持：小新助手 🎨
-                </div>
-                <div class="site-info">
-                    <p>版本：v1.0.0 | 固定网址系统 | 自动更新</p>
-                    <p>© 2026 订单查询系统 · 保留所有权利</p>
-                </div>
-            </div>
-        </footer>
+        <div class="footer">
+            <p>© 2026 嘉欣订单管家</p>
+            <p style="margin-top: 5px; font-size: 11px; opacity: 0.7;">技术支持：小新助手 🎨</p>
+        </div>
     </div>
 
     <script>
-        // 订单数据（实时同步）
-        const orderData = {
-            // 逸飞
-            'z6y2f1': {
-                name: '逸飞',
-                displayId: 'VIP001',
-                orderCount: 3,
+        // 客户数据（配置真实数据后删除示例）
+        const CUSTOMERS = {
+            // 示例数据，替换成真实客户信息
+            'customer1': {
+                name: '客户1',
                 orders: [
                     {
-                        id: 'order_001',
-                        product: '香烟',
+                        product: '产品A',
                         status: '已发货',
                         statusClass: 'status-shipped',
-                        orderNumber: 'EV070804591CN',
-                        logistics: '今日重新发货，运输途中',
-                        details: '您的订单已重新发出，正在运输途中',
-                        trackingNumber: 'EV070804591CN',
-                        time: '2026-03-24（今日发货）',
+                        orderNumber: 'ORD20260001',
+                        logistics: '已发货，运输中',
+                        details: '预计3-5天送达',
+                        trackingNumber: 'EV000000001CN',
+                        time: '2026-03-25 10:30',
                         hasTracking: true
-                    },
-                    {
-                        id: 'order_002',
-                        product: '香烟',
-                        status: '发货失败',
-                        statusClass: 'status-failed',
-                        orderNumber: 'EV070596315CN',
-                        logistics: '发货失败，货物已退回',
-                        details: '国际物流发货失败，货物已退回，已重新安排发货',
-                        time: '2026-03-24',
-                        hasTracking: false
-                    },
-                    {
-                        id: 'order_003',
-                        product: '香烟',
-                        status: '已下单',
-                        statusClass: 'status-ordered',
-                        orderNumber: '新香烟订单',
-                        logistics: '已下单，等待发货',
-                        details: '您的新香烟订单已下单，明天12点前发货',
-                        time: '2026-03-24',
-                        hasTracking: false,
-                        note: '明天12点前发货'
-                    }
-                ]
-            },
-            
-            // 潘妍霏
-            'pyf20010914': {
-                name: '潘妍霏',
-                displayId: 'VIP002',
-                orderCount: 3,
-                orders: [
-                    {
-                        id: 'order_004',
-                        product: '墨镜维修',
-                        status: '已完成',
-                        statusClass: 'status-completed',
-                        orderNumber: 'YT2584647636459',
-                        logistics: '墨镜寄修完成',
-                        details: '您的墨镜已成功维修并返回',
-                        trackingNumber: 'YT2584647636459',
-                        time: '2026-03-22',
-                        hasTracking: true
-                    },
-                    {
-                        id: 'order_005',
-                        product: '眼镜维修',
-                        status: '已发货',
-                        statusClass: 'status-shipped',
-                        orderNumber: 'YT2543954036002',
-                        logistics: '维修完成，正在寄回',
-                        details: '您的眼镜维修已完成，正在安排快递寄回',
-                        trackingNumber: 'YT2543954036002',
-                        time: '2026-03-24（今日发货）',
-                        hasTracking: true
-                    },
-                    {
-                        id: 'order_006',
-                        product: '鞋子',
-                        status: '已下单',
-                        statusClass: 'status-ordered',
-                        orderNumber: '鞋子订单',
-                        logistics: '已下单，等待发货',
-                        details: '您的鞋子订单已下单，明天12点前发货',
-                        time: '2026-03-24',
-                        hasTracking: false,
-                        note: '明天12点前发货'
-                    }
-                ]
-            },
-            
-            // 连理
-            'ljyy0208050': {
-                name: '连理',
-                displayId: 'VIP003',
-                orderCount: 2,
-                orders: [
-                    {
-                        id: 'order_007',
-                        product: '拖鞋',
-                        status: '已下单',
-                        statusClass: 'status-ordered',
-                        orderNumber: '拖鞋订单',
-                        logistics: '已下单，等待发货',
-                        details: '您的拖鞋订单已下单，明天12点前发货',
-                        time: '2026-03-24',
-                        hasTracking: false,
-                        note: '明天12点前发货'
-                    },
-                    {
-                        id: 'order_008',
-                        product: '吊带背心',
-                        status: '已下单',
-                        statusClass: 'status-ordered',
-                        orderNumber: '吊带背心订单',
-                        logistics: '已下单，等待发货',
-                        details: '您的吊带背心订单已下单，明天12点前发货',
-                        time: '2026-03-24',
-                        hasTracking: false,
-                        note: '明天12点前发货'
-                    }
-                ]
-            },
-            
-            // Sssnowy
-            'wxsnowywx77': {
-                name: 'Sssnowy',
-                displayId: 'VIP004',
-                orderCount: 2,
-                orders: [
-                    {
-                        id: 'order_009',
-                        product: '加拿大敏感货',
-                        status: '运输中',
-                        statusClass: 'status-transit',
-                        orderNumber: '2019317748244361',
-                        logistics: '国际运输中',
-                        details: '您的包裹正在国际运输途中',
-                        trackingNumber: '2019317748244361',
-                        time: '2026-03-22',
-                        hasTracking: true
-                    },
-                    {
-                        id: 'order_010',
-                        product: '加拿大快递',
-                        status: '已下单',
-                        statusClass: 'status-ordered',
-                        orderNumber: '新快递订单',
-                        logistics: '已下单，等待发货',
-                        details: '您的新快递订单已下单，明天12点前发货',
-                        time: '2026-03-24',
-                        hasTracking: false,
-                        note: '明天12点前发货'
                     }
                 ]
             }
         };
 
         // DOM元素
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const loading = document.getElementById('loading');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
-        const resultSection = document.getElementById('resultSection');
-        const statsSection = document.getElementById('statsSection');
-        const updateTime = document.getElementById('updateTime');
-        const searchTips = document.querySelectorAll('.search-tip');
+        const loginCard = document.getElementById('loginCard');
+        const authCode = document.getElementById('authCode');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const loadingCard = document.getElementById('loadingCard');
+        const orderSection = document.getElementById('orderSection');
+        const ordersContainer = document.getElementById('ordersContainer');
+        const backBtn = document.getElementById('backBtn');
 
-        // 搜索功能
-        function searchOrders() {
-            const wechatId = searchInput.value.trim().toLowerCase();
+        // 登录
+        function login() {
+            const code = authCode.value.trim();
             
-            if (!wechatId) {
-                showError('请输入微信号');
+            if (!code) {
+                showError('请输入验证信息');
                 return;
             }
-            
-            // 显示加载中
-            loading.style.display = 'block';
-            errorMessage.style.display = 'none';
-            resultSection.style.display = 'none';
-            statsSection.style.display = 'none';
-            
-            // 模拟网络延迟
-            setTimeout(() => {
-                if (orderData[wechatId]) {
-                    renderCustomerResult(orderData[wechatId], wechatId);
-                } else {
-                    showError('未找到该微信号的订单信息');
-                }
-                loading.style.display = 'none';
-            }, 800);
-        }
 
-        // 渲染客户结果
-        function renderCustomerResult(customer, wechatId) {
-            let ordersHtml = '';
-            
-            customer.orders.forEach(order => {
-                let trackingHtml = '';
-                if (order.hasTracking) {
-                    trackingHtml = `
-                        <div class="tracking-info">
-                            <div class="tracking-label">📮 发货单号：</div>
-                            <div class="tracking-number">${order.trackingNumber}</div>
-                        </div>
-                    `;
-                } else if (order.note) {
-                    trackingHtml = `
-                        <div class="tracking-info">
-                            <div class="tracking-label">📝 备注：</div>
-                            <div class="tracking-number">${order.note}</div>
-                        </div>
-                    `;
+            // 显示加载
+            loginCard.style.display = 'none';
+            errorMsg.style.display = 'none';
+            loadingCard.style.display = 'block';
+
+            // 模拟加载
+            setTimeout(() => {
+                const customer = CUSTOMERS[code];
+                
+                if (customer) {
+                    // 登录成功
+                    showOrders(customer);
+                } else {
+                    // 登录失败
+                    showError('验证失败，请检查输入');
+                    loginCard.style.display = 'block';
                 }
                 
-                ordersHtml += `
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div class="order-product">${order.product}</div>
-                            <div class="order-status ${order.statusClass}">${order.status}</div>
-                        </div>
-                        <div class="order-details">
-                            <div class="detail-row">
-                                <span class="detail-label">订单号：</span>
-                                <span class="detail-value">${order.orderNumber}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">状态：</span>
-                                <span class="detail-value">${order.logistics}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">详情：</span>
-                                <span class="detail-value">${order.details}</span>
-                            </div>
-                            ${trackingHtml}
-                        </div>
-                        <div class="order-time">更新时间：${order.time}</div>
-                    </div>
-                `;
-            });
-            
-            resultSection.innerHTML = `
-                <div class="customer-card">
-                    <div class="customer-header">
-                        <div class="customer-info">
-                            <h3>${customer.name} 的订单</h3>
-                            <div class="customer-id">微信号：${wechatId} | ${customer.displayId}</div>
-                        </div>
-                        <div class="customer-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">${customer.orderCount}</div>
-                                <div class="stat-label">总订单数</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">${getActiveOrders(customer.orders)}</div>
-                                <div class="stat-label">进行中</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="orders-list">
-                        ${ordersHtml}
-                    </div>
-                </div>
-                <button class="back-btn" onclick="showStats()">返回统计数据</button>
-            `;
-            
-            resultSection.style.display = 'block';
-            statsSection.style.display = 'none';
-        }
-
-        // 获取进行中订单数量
-        function getActiveOrders(orders) {
-            return orders.filter(order => 
-                order.status === '已下单' || 
-                order.status === '已发货' || 
-                order.status === '运输中'
-            ).length;
-        }
-
-        // 显示统计数据
-        function showStats() {
-            resultSection.style.display = 'none';
-            statsSection.style.display = 'block';
-            searchInput.value = '';
+                loadingCard.style.display = 'none';
+            }, 800);
         }
 
         // 显示错误
         function showError(message) {
-            errorText.textContent = message;
-            errorMessage.style.display = 'block';
-            resultSection.style.display = 'none';
-            statsSection.style.display = 'block';
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+
+        // 显示订单
+        function showOrders(customer) {
+            if (customer.orders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="card no-orders">
+                        <div class="no-orders-icon">📭</div>
+                        <h3 style="font-size: 16px; margin-bottom: 8px;">暂无订单</h3>
+                        <p style="font-size: 12px; color: #999;">您目前没有待处理的订单</p>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                customer.orders.forEach(order => {
+                    let trackingHtml = '';
+                    if (order.hasTracking) {
+                        trackingHtml = `
+                            <div class="tracking">
+                                <div class="tracking-label">物流单号</div>
+                                <div class="tracking-number">${order.trackingNumber}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                        <div class="card order-card">
+                            <div class="order-header">
+                                <div class="product-name">${order.product}</div>
+                                <div class="status ${order.statusClass}">${order.status}</div>
+                            </div>
+                            <div class="order-info">
+                                <div class="info-row">
+                                    <span class="label">订单号</span>
+                                    <span class="value">${order.orderNumber}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">状态</span>
+                                    <span class="value">${order.logistics}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="label">详情</span>
+                                    <span class="value">${order.details}</span>
+                                </div>
+                                ${trackingHtml}
+                            </div>
+                            <div class="order-time">更新于 ${order.time}</div>
+                        </div>
+                    `;
+                });
+                ordersContainer.innerHTML = html;
+            }
+            
+            orderSection.style.display = 'block';
+        }
+
+        // 返回登录
+        function backToLogin() {
+            orderSection.style.display = 'none';
+            loginCard.style.display = 'block';
+            authCode.value = '';
+            authCode.focus();
         }
 
         // 事件监听
-        searchBtn.addEventListener('click', searchOrders);
-        
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchOrders();
-            }
-        });
+        loginBtn.addEventListener('click', login);
+        authCode.addEventListener('keypress', e => e.key === 'Enter' && login());
+        backBtn.addEventListener('click', backToLogin);
 
-        // 搜索提示点击
-        searchTips.forEach(tip => {
-            tip.addEventListener('click', function() {
-                const wechatId = this.getAttribute('data-wechat');
-                searchInput.value = wechatId;
-                searchOrders();
-            });
-        });
-
-        // 初始化显示统计数据
-        showStats();
-
-        // 更新时间为当前时间
-        function updateCurrentTime() {
-            const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            updateTime.textContent = now.toLocaleDateString('zh-CN', options);
-        }
-
-        // 页面加载时更新时间
-        updateCurrentTime();
-        
-        // 每30秒更新时间
-        setInterval(updateCurrentTime, 30000);
-
-        // 显示当前网址
-        document.getElementById('siteUrl').textContent = window.location.href;
+        // 自动聚焦
+        window.addEventListener('load', () => authCode.focus());
     </script>
 </body>
 </html>
